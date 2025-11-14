@@ -1,5 +1,6 @@
 # folders
 /is
+/__pycache__
 
 # files
 schema.sql
