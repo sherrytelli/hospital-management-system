@@ -2,6 +2,7 @@ import streamlit as st
 import hashlib
 import psycopg2
 from database import get_db_conn, verify_password
+from time import sleep
 
 if "authenticated" not in st.session_state:
     st.session_state.authenticated = False
@@ -37,41 +38,35 @@ def authenticate_user(username, password):
             conn.close()
             
     return None, None
-
-def login_page():
-    """login page function"""
-    
-    st.title("Hospital Management System - Login")
-    
-    username = st.text_input("username")
-    password = st.text_input("password", type="password")
-    
-    if st.button("login"):
-        if username and password:
-            user_id, role = authenticate_user(username, password)
-            if user_id:
-                st.session_state.authenticated = True
-                st.session_state.userrole = role
-                st.session_state.username = username
-                st.success(f"Welcome, {username}! Redirecting...")
-                st.rerun()
-                
-            else:
-                st.error("Invalid username or password")
-
-        else:
-            st.error("Please enter both username and password")
             
 def main():
     """the main function to run the application"""
     
-    #check authentication status
-    if st.session_state.authenticated == False:
-        login_page()
-        return
-    
-    #user authenticated
     #creating pages
+    def login_page():
+        """login page function"""
+        
+        st.title("Hospital Management System - Login")
+        
+        username = st.text_input("username")
+        password = st.text_input("password", type="password")
+        
+        if st.button("login"):
+            if username and password:
+                user_id, role = authenticate_user(username, password)
+                if user_id:
+                    st.session_state.authenticated = True
+                    st.session_state.userrole = role
+                    st.session_state.username = username
+                    st.success(f"Welcome, {username}! Redirecting...")
+                    sleep(2)
+                    st.rerun()
+                    
+                else:
+                    st.error("Invalid username or password")
+
+            else:
+                st.error("Please enter both username and password")
     
     def logout():
         st.session_state.authenticated = False
@@ -79,14 +74,24 @@ def main():
         st.session_state.username = None
         st.rerun()
         
-    logout_page = st.Page(logout, title=f"Logout ({st.session_state.username})", icon=":material/logout:") 
+    logout_page = st.Page(logout, title=f"Logout", icon=":material/logout:") 
     
     admin_home = st.Page("pages/01_Admin_Home.py", title="Admin Dashboard", icon=":material/dashboard:")
-    admin_audit = st.Page("pages/02_Admin_Audit_Log.py", title="Audit Log", icon=":material/list_alt:")
+    admin_audit = st.Page("pages/02_Admin_Audit.py", title="Audit Log", icon=":material/list_alt:")
     
     doctor_home = st.Page("pages/03_Doctor_Home.py", title="Doctor View", icon=":material/medication:")
     
     receptionist_home = st.Page("pages/04_Receptionist_Home.py", title="Receptionist View", icon=":material/person_add:")
+    
+    #check authentication status
+    if st.session_state.authenticated == False:
+        pg = st.navigation([
+            st.Page(login_page, title="Login", default=True)
+        ], position="hidden") # Hide the navigation menu
+        pg.run()
+        return
+    
+    #user authenticated
     
     #creating side_panals for each page
     
