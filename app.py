@@ -6,11 +6,11 @@ from database import get_db_conn, verify_password
 if "authenticated" not in st.session_state:
     st.session_state.authenticated = False
     
-if "user_role" not in st.session_state:
-    st.session_state.user_role = None
+if "userrole" not in st.session_state:
+    st.session_state.userrole = None
     
-if "user_name" not in st.session_state:
-    st.session_state.user_role = None
+if "username" not in st.session_state:
+    st.session_state.userrole = None
     
 #function to authenticate user
 def authenticate_user(username, password):
@@ -51,8 +51,8 @@ def login_page():
             user_id, role = authenticate_user(username, password)
             if user_id:
                 st.session_state.authenticated = True
-                st.session_state.user_role = role
-                st.session_state.user_name = username
+                st.session_state.userrole = role
+                st.session_state.username = username
                 st.success(f"Welcome, {username}! Redirecting...")
                 st.rerun()
                 
@@ -70,4 +70,50 @@ def main():
         login_page()
         return
     
+    #user authenticated
+    #creating pages
+    
+    def logout():
+        st.session_state.authenticated = False
+        st.session_state.userrole = None
+        st.session_state.username = None
+        st.rerun()
         
+    logout_page = st.Page(logout, title=f"Logout ({st.session_state.username})", icon=":material/logout:") 
+    
+    admin_home = st.Page("pages/01_Admin_Home.py", title="Admin Dashboard", icon=":material/dashboard:")
+    admin_audit = st.Page("pages/02_Admin_Audit_Log.py", title="Audit Log", icon=":material/list_alt:")
+    
+    doctor_home = st.Page("pages/03_Doctor_Home.py", title="Doctor View", icon=":material/medication:")
+    
+    receptionist_home = st.Page("pages/04_Receptionist_Home.py", title="Receptionist View", icon=":material/person_add:")
+    
+    #creating side_panals for each page
+    
+    if st.session_state.userrole == "admin":
+        pg = st.navigation({
+            "Admin Panal": [admin_home, admin_audit],
+            "Account": [logout_page]
+        })
+    
+    elif st.session_state.userrole == "doctor":
+        pg = st.navigation({
+            "Doctor Panal": [doctor_home],
+            "Account": [logout_page]
+        })
+        
+    elif st.session_state.userrole == "receptionist":
+        pg = st.navigation({
+            "Receptionist Panal": [receptionist_home],
+            "Account": [logout_page]
+        })
+    else:
+        st.error("Role not recognized. Please log in again.")
+        logout()
+        return
+    
+    #run the created pages
+    pg.run()
+    
+if __name__ == "__main__":
+    main()
