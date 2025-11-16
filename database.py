@@ -10,6 +10,8 @@ def verify_password(stored_password, provided_password):
     return stored_password == hashlib.sha256(provided_password.encode()).hexdigest()
 
 def get_db_conn():
+    "returns a connection to the database"
+    
     try:
         conn = psycopg2.connect(
             host=DATABASE_CONFIG["db_host"],
@@ -23,6 +25,97 @@ def get_db_conn():
     except Exception as e:
         logging.error(f"database connection error: {e}")
         return None
+    
+def add_patient(name, contact, diagnosis):
+    """adds new patient in the database"""
+    
+    conn = get_db_conn()
+    if conn:
+        try:
+            cursor = conn.cursor()
+            cursor.execute("""
+                    INSERT INTO patients (name, contact, diagnosis) VALUES (%s, %s, %s, ''. '') RETURNING patient_id;
+                        """, (name, contact, diagnosis))
+            patient_id = cursor.fetchone()[0]
+            conn.commit()
+            cursor.close()
+            return patient_id
+        
+        except Exception as e:
+            logging.error(f"Error adding patient: {e}")
+            return None
+        
+        finally:
+            conn.close()
+    else:
+        print("Failed to connect to the database to add patient.")
+        return None
+
+def annonymize_patient_data(patient_id):
+    """applies masking logic to patient data and inserts into database"""
+    
+    conn = get_db_conn()
+    if conn:
+        try:
+            cursor = conn.cursor()
+            cursor.execute("""
+                    SELECT contact FROM patients WHERE patient_id = %s
+                        """, (patient_id,))
+            result = cursor.fetchone()
+            
+            if result:
+                original_contact = result
+                
+                anon_name = f"ANNON_{patient_id}"
+                anon_contact = "XXX-XXX-XXXX" if original_contact else ''
+                
+                cursor.execute("""
+                        UPDATE patients SET anonymized_name = %s, anonymized_contact = %s WHERE patient_id = %s;
+                            """, (anon_name, anon_contact, patient_id))
+                
+                conn.commit()
+                cursor.close()
+                return True
+            
+            else:
+                cursor.close()
+                return False
+        
+        except Exception as e:
+            logging.error(f"Error anonymizing patient data: {e}")
+            cursor.close()
+            return False
+        
+        finally:
+            cursor.close()
+            conn.cursor()
+    
+    else:
+        logging.error("Failed to connect to the database to anonymize patient data.")
+        return False
+    
+def log_action(user_id, roll, action, details):
+    """logs the actions of all the employees in the logs table"""
+    
+    conn = get_db_conn()
+    if conn:
+        try:
+            cursor = conn.cursor()
+            cursor.execute("""
+                    INSERT INTO logs(user_id, role, action, details) VALUES (%s, %s, %s, %s);
+                        """, (user_id, roll, action, details))
+            conn.commit()
+            cursor.close()
+        
+        except Exception as e:
+            logging.error(f"Error logging action: {e}")
+            
+        finally:
+            cursor.close()
+            conn.close()
+    
+    else:
+        logging.error("Failed to connect to the database to log action.")
 
 def init_db():
     conn = get_db_conn()
