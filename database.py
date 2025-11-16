@@ -26,6 +26,31 @@ def get_db_conn():
         logging.error(f"database connection error: {e}")
         return None
     
+def authenticate_user(username, password):
+    """function to authenticate user"""
+    
+    conn = get_db_conn()
+    if conn:
+        try:
+            cursor = conn.cursor()
+            cursor.execute("SELECT user_id, password, role FROM users WHERE username = %s;", (username,))
+            result = cursor.fetchone()
+        
+            if result:
+                user_id, stored_password, role = result
+                if verify_password(stored_password, password):
+                    return user_id, role
+            return None, None
+    
+        except Exception as e:
+            st.error(f"authentication error {e}")
+            return None, None
+        
+        finally:
+            conn.close()
+            
+    return None, None
+    
 def add_patient(name, contact, diagnosis):
     """adds new patient in the database"""
     

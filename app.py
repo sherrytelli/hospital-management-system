@@ -1,7 +1,7 @@
 import streamlit as st
 import hashlib
 import psycopg2
-from database import get_db_conn, verify_password
+from database import get_db_conn, verify_password, authenticate_user
 from time import sleep
 
 if "authenticated" not in st.session_state:
@@ -12,32 +12,6 @@ if "userrole" not in st.session_state:
     
 if "username" not in st.session_state:
     st.session_state.userrole = None
-    
-#function to authenticate user
-def authenticate_user(username, password):
-    """function to authenticate user"""
-    
-    conn = get_db_conn()
-    if conn:
-        try:
-            cursor = conn.cursor()
-            cursor.execute("SELECT user_id, password, role FROM users WHERE username = %s;", (username,))
-            result = cursor.fetchone()
-        
-            if result:
-                user_id, stored_password, role = result
-                if verify_password(stored_password, password):
-                    return user_id, role
-            return None, None
-    
-        except Exception as e:
-            st.error(f"authentication error {e}")
-            return None, None
-        
-        finally:
-            conn.close()
-            
-    return None, None
             
 def main():
     """the main function to run the application"""
