@@ -1,6 +1,7 @@
 import psycopg2
 import logging
 import hashlib
+import pandas as pd
 from config import DATABASE_CONFIG
 
 def hash_password(password):
@@ -59,7 +60,7 @@ def add_patient(name, contact, diagnosis):
         try:
             cursor = conn.cursor()
             cursor.execute("""
-                    INSERT INTO patients (name, contact, diagnosis) VALUES (%s, %s, %s, ''. '') RETURNING patient_id;
+                    INSERT INTO patients (name, contact, diagnosis) VALUES (%s, %s, %s) RETURNING patient_id;
                         """, (name, contact, diagnosis))
             patient_id = cursor.fetchone()[0]
             conn.commit()
@@ -141,6 +142,78 @@ def log_action(user_id, roll, action, details=""):
     
     else:
         logging.error("Failed to connect to the database to log action.")
+
+def get_raw_patient_data():
+    """returns the raw patient data"""
+    
+    conn = get_db_conn()
+    if conn:
+        try:
+            raw_data_df = pd.read_sql_query("SELECT patient_id, name, contact, diagnosis, date_added FROM patients;", conn)
+            if not raw_data_df.empty:
+                conn.close()
+                return True, raw_data_df
+            
+            else:
+                conn.close()
+                return False, "No patient records found."
+        
+        except Exception as e:
+            logging.error(f"Error fetching raw data: {e}")
+        
+        finally:
+            conn.close()
+    
+    else:
+        logging.error("Could not connect to database to fetch raw data.")
+        
+def get_logs():
+    """return the logs of the database"""
+    
+    conn = get_db_conn()
+    if conn:
+        try:
+            logs_df = pd.read_sql_query("SELECT role, action, timestamp, details FROM logs ORDER BY timestamp DESC LIMIT 100;", conn)
+            if not logs_df.empty:
+                conn.close()
+                return True, logs_df
+            
+            else:
+                conn.close()
+                return False, "No logs found."
+        
+        except Exception as e:
+            logging.error(f"Error fetching logs: {e}")
+        
+        finally:
+            conn.close()
+    
+    else:
+        logging.error("Could not connect to database to fetch logs.")      
+
+def get_anon_patient_data():
+    """returns the anonymized patient data"""
+    
+    conn = get_db_conn()
+    if conn:
+        try:
+            anon_data_df = pd.read_sql_query("SELECT anonymized_name, anonymized_contact, diagnosis, date_added FROM patients WHERE anonymized_name != '' AND anonymized_name IS NOT NULL;", conn)
+            if not anon_data_df.empty:
+                conn.close()
+                return True, anon_data_df
+            
+            else:
+                conn.close()
+                return False, "No patient records found."
+        
+        except Exception as e:
+            logging.error(f"Error fetching anonymized data: {e}")
+            
+        finally:
+            conn.close()
+            
+    else:
+        logging.error("Could not connect to database to fetch anonymized data.")
 
 def init_db():
     conn = get_db_conn()
