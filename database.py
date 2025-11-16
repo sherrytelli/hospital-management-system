@@ -43,7 +43,7 @@ def authenticate_user(username, password):
             return None, None
     
         except Exception as e:
-            st.error(f"authentication error {e}")
+            logging.error(f"authentication error {e}")
             return None, None
         
         finally:
