@@ -1,7 +1,7 @@
 import streamlit as st
 import hashlib
 import psycopg2
-from database import get_db_conn, verify_password, authenticate_user
+from database import authenticate_user
 from time import sleep
 
 if "authenticated" not in st.session_state:
