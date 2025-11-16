@@ -51,7 +51,7 @@ def add_patient(name, contact, diagnosis):
         print("Failed to connect to the database to add patient.")
         return None
 
-def annonymize_patient_data(patient_id):
+def anonymize_patient_data(patient_id):
     """applies masking logic to patient data and inserts into database"""
     
     conn = get_db_conn()
