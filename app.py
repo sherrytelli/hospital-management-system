@@ -10,8 +10,8 @@ if "authenticated" not in st.session_state:
 if "userrole" not in st.session_state:
     st.session_state.userrole = None
     
-if "username" not in st.session_state:
-    st.session_state.userrole = None
+if "userid" not in st.session_state:
+    st.session_state.userid = None
             
 def main():
     """the main function to run the application"""
@@ -31,7 +31,7 @@ def main():
                 if user_id:
                     st.session_state.authenticated = True
                     st.session_state.userrole = role
-                    st.session_state.username = username
+                    st.session_state.userid = user_id
                     st.success(f"Welcome, {username}! Redirecting...")
                     sleep(2)
                     st.rerun()
