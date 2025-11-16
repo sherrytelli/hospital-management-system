@@ -1,5 +1,5 @@
 import streamlit as st
-from database import authenticate_user
+from database import authenticate_user, log_action
 from time import sleep
 
 if "authenticated" not in st.session_state:
@@ -34,6 +34,7 @@ def main():
                     st.session_state.userrole = role
                     st.session_state.userid = user_id
                     st.session_state.username = username
+                    log_action(user_id, role, 'Login', f'User {username} logged in successfully.')
                     st.success(f"Welcome, {username}! Redirecting...")
                     sleep(2)
                     st.rerun()
@@ -45,6 +46,7 @@ def main():
                 st.error("Please enter both username and password")
     
     def logout():
+        log_action(st.session_state.userid, st.session_state.userrole, f'User {st.session_state.username} logged out.')
         st.session_state.authenticated = False
         st.session_state.userrole = None
         st.session_state.userid = None
