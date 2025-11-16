@@ -1,6 +1,4 @@
 import streamlit as st
-import hashlib
-import psycopg2
 from database import authenticate_user
 from time import sleep
 
@@ -12,7 +10,10 @@ if "userrole" not in st.session_state:
     
 if "userid" not in st.session_state:
     st.session_state.userid = None
-            
+    
+if "username" not in st.session_state:
+    st.session_state.username = None
+
 def main():
     """the main function to run the application"""
     
@@ -32,6 +33,7 @@ def main():
                     st.session_state.authenticated = True
                     st.session_state.userrole = role
                     st.session_state.userid = user_id
+                    st.session_state.username = username
                     st.success(f"Welcome, {username}! Redirecting...")
                     sleep(2)
                     st.rerun()
