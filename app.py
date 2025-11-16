@@ -46,7 +46,7 @@ def main():
                 st.error("Please enter both username and password")
     
     def logout():
-        log_action(st.session_state.userid, st.session_state.userrole, f'User {st.session_state.username} logged out.')
+        log_action(st.session_state.userid, st.session_state.userrole, "Logout", f'User {st.session_state.username} logged out.')
         st.session_state.authenticated = False
         st.session_state.userrole = None
         st.session_state.userid = None
