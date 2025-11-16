@@ -119,7 +119,7 @@ def anonymize_patient_data(patient_id):
         logging.error("Failed to connect to the database to anonymize patient data.")
         return False
     
-def log_action(user_id, roll, action, details):
+def log_action(user_id, roll, action, details=""):
     """logs the actions of all the employees in the logs table"""
     
     conn = get_db_conn()
