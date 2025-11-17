@@ -26,7 +26,7 @@ if got_data:
     activity_by_date_role = data.groupby(['date', 'role']).size().reset_index(name='count')
     activity_by_date_role = activity_by_date_role.pivot(index='date', columns='role', values='count').fillna(0)
     if not activity_by_date_role.empty:
-        st.bar_chart(activity_by_date_role, width="content", height=400)
+        st.bar_chart(activity_by_date_role, use_container_width=True, height=400)
         
     else:
         st.info("Not enough log data to generate activity chart.")
