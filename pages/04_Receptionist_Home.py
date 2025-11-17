@@ -31,7 +31,7 @@ with st.form("add_patient_form", clear_on_submit=True, enter_to_submit=False):
                 msg.empty()
             else:
                 msg = st.empty()
-                msg.success("Failed to add patient.")
+                msg.error("Failed to add patient.")
                 sleep(2)
                 msg.empty()
         
