@@ -104,12 +104,17 @@ def anonymize_patient_data(patient_id):
                 anon_contact = "XXX-XXX-XXXX" if original_contact else ''
                 
                 cursor.execute("""
-                        UPDATE patients SET anonymized_name = %s, anonymized_contact = %s WHERE patient_id = %s;
+                        UPDATE patients SET anonymized_name = %s, anonymized_contact = %s WHERE patient_id = %s AND anonymized_name IS NULL;
                             """, (anon_name, anon_contact, patient_id))
                 
+                rows_affected = cursor.rowcount
                 conn.commit()
                 cursor.close()
-                return True
+                if rows_affected > 0:
+                    return True
+                
+                else:
+                    return False 
             
             else:
                 cursor.close()
@@ -181,7 +186,7 @@ def get_logs():
     conn = get_db_conn()
     if conn:
         try:
-            logs_df = pd.read_sql_query("SELECT role, action, timestamp, details FROM logs ORDER BY timestamp DESC LIMIT 100;", conn)
+            logs_df = pd.read_sql_query("SELECT log_id, role, action, timestamp, details FROM logs ORDER BY log_id DESC LIMIT 100;", conn)
             if not logs_df.empty:
                 conn.close()
                 return True, logs_df
