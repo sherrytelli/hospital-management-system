@@ -15,7 +15,7 @@ st.title("Audit Log")
 #displaying logs
 got_data, data = get_logs()
 if got_data:
-    st.dataframe(data, use_container_width=True)
+    st.dataframe(data, use_container_width=True, hide_index=True)
 
 else:
     st.info(data)

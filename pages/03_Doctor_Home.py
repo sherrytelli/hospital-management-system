@@ -15,7 +15,7 @@ st.title(f"Doctor View - Welcome {st.session_state.username}")
 st.header("Patient Data")
 got_data, data = get_anon_patient_data()
 if got_data:
-    st.dataframe(data, use_container_width=True)
+    st.dataframe(data, use_container_width=True, hide_index=True)
     
 else:
     st.info(data)
