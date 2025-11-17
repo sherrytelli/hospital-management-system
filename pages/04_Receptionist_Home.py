@@ -1,5 +1,6 @@
 import streamlit as st
-from database import log_action, anonymize_patient_data, add_patient
+from database import log_action, add_patient
+from time import sleep
 
 if not st.session_state.authenticated or st.session_state.userrole != "receptionist":
     st.error("Access Denied: Receptionists only. ")
@@ -23,11 +24,16 @@ with st.form("add_patient_form", clear_on_submit=True, enter_to_submit=False):
         if name and contact and diagnosis:
             inserted = add_patient(name, contact, diagnosis)
             if inserted:
-                st.success(f"Patient '{name}' added successfully!")
                 log_action(st.session_state.userid, st.session_state.userrole, 'Added Patient', f"Patient '{name}' added successfully")
-            
+                msg = st.empty()
+                msg.success("Patient added successfully!")
+                sleep(2)
+                msg.empty()
             else:
-                st.error("Failed to add patient.")
+                msg = st.empty()
+                msg.success("Failed to add patient.")
+                sleep(2)
+                msg.empty()
         
         else:
             missing_fields = []
