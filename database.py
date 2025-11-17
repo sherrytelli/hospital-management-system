@@ -63,9 +63,17 @@ def add_patient(name, contact, diagnosis):
                     INSERT INTO patients (name, contact, diagnosis) VALUES (%s, %s, %s) RETURNING patient_id;
                         """, (name, contact, diagnosis))
             patient_id = cursor.fetchone()[0]
+            
+            if patient_id:
+                conn.commit()
+                cursor.close()
+                conn.close()
+                return True
+            
             conn.commit()
             cursor.close()
-            return patient_id
+            conn.close()
+            return False
         
         except Exception as e:
             logging.error(f"Error adding patient: {e}")
