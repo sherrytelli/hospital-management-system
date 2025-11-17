@@ -1,6 +1,6 @@
 import streamlit as st
 from database import authenticate_user, log_action
-from time import sleep
+from time import sleep, time, strftime, localtime
 
 if "authenticated" not in st.session_state:
     st.session_state.authenticated = False
@@ -13,6 +13,9 @@ if "userid" not in st.session_state:
     
 if "username" not in st.session_state:
     st.session_state.username = None
+
+if 'appstarttime' not in st.session_state:
+    st.session_state.appstarttime = time()
 
 def main():
     """the main function to run the application"""
@@ -51,6 +54,7 @@ def main():
         st.session_state.userrole = None
         st.session_state.userid = None
         st.session_state.username = None
+        st.session_state.app_start_time = time()
         st.rerun()
         
     logout_page = st.Page(logout, title=f"Logout", icon=":material/logout:") 
@@ -68,6 +72,7 @@ def main():
             st.Page(login_page, title="Login", default=True)
         ], position="hidden") # Hide the navigation menu
         pg.run()
+        st.caption(f"System Uptime: {strftime('%Y-%m-%d %I:%M:%S %p', localtime(st.session_state.appstarttime))} | Session Start")
         return
     
     #user authenticated
@@ -98,6 +103,8 @@ def main():
     
     #run the created pages
     pg.run()
+    
+    st.caption(f"System Uptime: {strftime('%Y-%m-%d %I:%M:%S %p', localtime(st.session_state.appstarttime))} | Session Start")
     
 if __name__ == "__main__":
     main()
