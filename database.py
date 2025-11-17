@@ -210,7 +210,7 @@ def get_anon_patient_data():
     conn = get_db_conn()
     if conn:
         try:
-            anon_data_df = pd.read_sql_query("SELECT anonymized_name, anonymized_contact, diagnosis, date_added FROM patients WHERE anonymized_name != '' AND anonymized_name IS NOT NULL;", conn)
+            anon_data_df = pd.read_sql_query("SELECT anonymized_name, anonymized_contact, diagnosis FROM patients WHERE anonymized_name != '' AND anonymized_name IS NOT NULL;", conn)
             if not anon_data_df.empty:
                 conn.close()
                 return True, anon_data_df
