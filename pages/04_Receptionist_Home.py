@@ -21,7 +21,7 @@ with st.form("add_patient_form", clear_on_submit=True, enter_to_submit=False):
     
     if submitted:
         if name and contact and diagnosis:
-            inserted = anonymize_patient_data(add_patient(name, contact, diagnosis))
+            inserted = add_patient(name, contact, diagnosis)
             if inserted:
                 st.success(f"Patient '{name}' added successfully!")
                 log_action(st.session_state.userid, st.session_state.userrole, 'Added Patient', f"Patient '{name}' added successfully")
