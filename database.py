@@ -157,7 +157,7 @@ def get_raw_patient_data():
     conn = get_db_conn()
     if conn:
         try:
-            raw_data_df = pd.read_sql_query("SELECT patient_id, name, contact, diagnosis, date_added FROM patients;", conn)
+            raw_data_df = pd.read_sql_query("SELECT * FROM patients;", conn)
             if not raw_data_df.empty:
                 conn.close()
                 return True, raw_data_df
